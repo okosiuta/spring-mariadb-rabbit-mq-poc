@@ -1,0 +1,40 @@
+version: '3'
+
+services:
+  backend:
+    image: poc_app
+    container_name: poc_app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    networks:
+      - backend
+    restart: always
+    depends_on:
+      - mariadb
+      - rabbitmq
+  mariadb:
+    container_name: mariadb
+    image: mariadb:10.2
+    environment:
+      MYSQL_DATABASE: poc_db
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_PASSWORD: root
+    networks:
+      - backend
+    restart: always
+  rabbitmq:
+    image: rabbitmq:3.11-management
+    container_name: rabbitmq
+    networks:
+      - backend
+    restart: always
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+
+networks:
+  backend:
+    driver: bridge
